@@ -26,7 +26,7 @@ public class EntretiensController : ControllerBase
     {
         var entretiens = await _context.Entretiens
             .Include(e => e.Vehicule)
-            .Include(e => e.Employe)
+            .Include(e => e.Employe!)
                 .ThenInclude(emp => emp.Utilisateur)
             .ToListAsync();
 
@@ -38,7 +38,7 @@ public class EntretiensController : ControllerBase
     {
         var entretiens = await _context.Entretiens
             .Include(e => e.Vehicule)
-            .Include(e => e.Employe)
+            .Include(e => e.Employe!)
                 .ThenInclude(emp => emp.Utilisateur)
             .Where(e => e.EstUrgent && e.Statut != StatutEntretien.TERMINE)
             .ToListAsync();
@@ -51,7 +51,7 @@ public class EntretiensController : ControllerBase
     {
         var entretien = await _context.Entretiens
             .Include(e => e.Vehicule)
-            .Include(e => e.Employe)
+            .Include(e => e.Employe!)
                 .ThenInclude(emp => emp.Utilisateur)
             .FirstOrDefaultAsync(e => e.Id == id);
 

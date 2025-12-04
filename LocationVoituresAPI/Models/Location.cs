@@ -66,7 +66,10 @@ public class Location
     // Méthodes métier
     public void CalculerMontant(Vehicule vehicule)
     {
-        DureeJours = (DateFin - DateDebut).Days;
+        // Utiliser TotalDays avec Math.Ceiling pour éviter 0 jour
+        // Minimum 1 jour même pour une location de quelques heures
+        var duree = (DateFin - DateDebut).TotalDays;
+        DureeJours = Math.Max(1, (int)Math.Ceiling(duree));
         MontantTotal = vehicule.CalculerPrixLocation(DureeJours);
     }
 

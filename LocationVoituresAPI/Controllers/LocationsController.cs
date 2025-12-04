@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LocationVoituresAPI.Data;
+using LocationVoituresAPI.DTOs;
 using LocationVoituresAPI.Models;
 using LocationVoituresAPI.Services;
 using QRCoder;
@@ -38,7 +39,7 @@ public class LocationsController : ControllerBase
                 .ThenInclude(c => c.Utilisateur)
             .Include(l => l.Vehicule)
                 .ThenInclude(v => v.TypeVehicule)
-            .Include(l => l.Employe)
+            .Include(l => l.Employe!)
                 .ThenInclude(e => e.Utilisateur)
             .Include(l => l.Paiement)
             .ToListAsync();
@@ -54,7 +55,7 @@ public class LocationsController : ControllerBase
                 .ThenInclude(c => c.Utilisateur)
             .Include(l => l.Vehicule)
                 .ThenInclude(v => v.TypeVehicule)
-            .Include(l => l.Employe)
+            .Include(l => l.Employe!)
                 .ThenInclude(e => e.Utilisateur)
             .Include(l => l.Paiement)
             .FirstOrDefaultAsync(l => l.Id == id);
@@ -66,22 +67,54 @@ public class LocationsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Location>> CreateLocation([FromBody] Location location)
+    public async Task<ActionResult<Location>> CreateLocation([FromBody] CreateLocationDto dto)
     {
+        // Valider les dates
+        if (dto.DateFin <= dto.DateDebut)
+            return BadRequest("La date de fin doit être postérieure à la date de début");
+
+        if (dto.DateDebut < DateTime.UtcNow.Date)
+            return BadRequest("La date de début ne peut pas être dans le passé");
+
+        // Vérifier que le client existe
+        var client = await _context.Clients
+            .Include(c => c.Utilisateur)
+            .FirstOrDefaultAsync(c => c.Id == dto.ClientId);
+
+        if (client == null)
+            return NotFound("Client introuvable");
+
+        // Vérifier que le véhicule existe et est disponible
         var vehicule = await _context.Vehicules
             .Include(v => v.Locations)
-            .FirstOrDefaultAsync(v => v.Id == location.VehiculeId);
+            .FirstOrDefaultAsync(v => v.Id == dto.VehiculeId);
 
         if (vehicule == null)
             return NotFound("Véhicule introuvable");
 
+        // Créer l'objet Location
+        var location = new Location
+        {
+            DateDebut = dto.DateDebut,
+            DateFin = dto.DateFin,
+            ClientId = dto.ClientId,
+            VehiculeId = dto.VehiculeId,
+            EmployeId = dto.EmployeId,
+            Statut = StatutLocation.EN_ATTENTE
+        };
+
+        // Vérifier la disponibilité
         if (!location.VerifierDisponibilite(vehicule))
             return BadRequest("Le véhicule n'est pas disponible pour cette période");
 
+        // Calculer le montant
         location.CalculerMontant(vehicule);
-        location.Statut = StatutLocation.EN_ATTENTE;
 
-        // Générer QR Code
+        // Ajouter à la base de données
+        _context.Locations.Add(location);
+        await _context.SaveChangesAsync();
+
+        // Générer QR Code après avoir l'ID
         var qrCodeData = $"LOC-{location.Id:D6}";
         using var qrGenerator = new QRCodeGenerator();
         var qrData = qrGenerator.CreateQrCode(qrCodeData, QRCodeGenerator.ECCLevel.Q);
@@ -89,22 +122,14 @@ public class LocationsController : ControllerBase
         var qrCodeBytes = qrCode.GetGraphic(20);
         location.QRCode = Convert.ToBase64String(qrCodeBytes);
 
-        _context.Locations.Add(location);
         await _context.SaveChangesAsync();
 
         // Envoyer email de confirmation
-        var client = await _context.Clients
-            .Include(c => c.Utilisateur)
-            .FirstOrDefaultAsync(c => c.Id == location.ClientId);
-
-        if (client != null)
-        {
-            await _emailService.EnvoyerEmailConfirmationAsync(
-                client.Utilisateur.Email,
-                client.Utilisateur.Nom,
-                client.Utilisateur.Prenom,
-                qrCodeData);
-        }
+        await _emailService.EnvoyerEmailConfirmationAsync(
+            client.Utilisateur.Email,
+            client.Utilisateur.Nom,
+            client.Utilisateur.Prenom,
+            qrCodeData);
 
         return CreatedAtAction(nameof(GetLocation), new { id = location.Id }, location);
     }

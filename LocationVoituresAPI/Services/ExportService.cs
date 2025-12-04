@@ -59,17 +59,17 @@ public class ExportService : IExportService
         return await Task.FromResult(Encoding.UTF8.GetBytes(csv.ToString()));
     }
 
-    public async Task<byte[]> ExporterDonneesAsync<T>(List<T> data, string format)
+    public Task<byte[]> ExporterDonneesAsync<T>(List<T> data, string format)
     {
         return format.ToUpper() switch
         {
-            "EXCEL" => await ExporterExcelAsync(data),
-            "CSV" => await ExporterCSVAsync(data),
+            "EXCEL" => ExporterExcelAsync(data),
+            "CSV" => ExporterCSVAsync(data),
             _ => throw new ArgumentException($"Format non supporté: {format}")
         };
     }
 
-    public async Task<List<T>> ImporterDonneesAsync<T>(Stream stream, string format)
+    public Task<List<T>> ImporterDonneesAsync<T>(Stream stream, string format)
     {
         // Implémentation simplifiée - à compléter selon les besoins
         throw new NotImplementedException("Import non implémenté");

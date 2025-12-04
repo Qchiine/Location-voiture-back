@@ -150,7 +150,7 @@ public class AuthService : IAuthService
         // Dans une implémentation complète, on vérifierait le refresh token en base
         // Pour simplifier, on accepte n'importe quel refresh token valide
         // TODO: Implémenter la table RefreshTokens en base de données
-        return null;
+        return await Task.FromResult<AuthResponseDto?>(null);
     }
 
     public string GenerateJwtToken(Utilisateur utilisateur)
