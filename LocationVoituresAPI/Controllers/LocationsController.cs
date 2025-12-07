@@ -165,6 +165,7 @@ public class LocationsController : ControllerBase
                     client.Utilisateur.Email,
                     client.Utilisateur.Nom,
                     client.Utilisateur.Prenom,
+                    location.QRCode ?? string.Empty,
                     qrCodeData);
                 Console.WriteLine($"[Email] Confirmation envoyée pour location {location.Id}");
             }

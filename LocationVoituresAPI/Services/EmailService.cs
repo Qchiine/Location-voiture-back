@@ -12,7 +12,7 @@ public class EmailService : IEmailService
         _configuration = configuration;
     }
 
-    private async Task EnvoyerEmailAsync(string to, string sujet, string corpsHtml)
+    private async Task EnvoyerEmailAsync(string to, string sujet, string corpsHtml, byte[]? inlineQr = null, string? inlineContentId = null)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress("Location Voitures", _configuration["Email:SenderEmail"]));
@@ -23,6 +23,18 @@ public class EmailService : IEmailService
         {
             HtmlBody = corpsHtml
         };
+
+        // Ajouter le QR code en ressource inline pour éviter les blocages des data URI côté client mail
+        if (inlineQr is not null && inlineQr.Length > 0)
+        {
+            var image = bodyBuilder.LinkedResources.Add("qr-code.png", inlineQr, ContentType.Parse("image/png"));
+            image.ContentId = inlineContentId ?? Guid.NewGuid().ToString("N");
+            image.ContentDisposition = new ContentDisposition(ContentDisposition.Inline)
+            {
+                FileName = "qr-code.png"
+            };
+            image.ContentType.Name = "qr-code.png";
+        }
         message.Body = bodyBuilder.ToMessageBody();
 
         using var client = new SmtpClient();
@@ -34,19 +46,25 @@ public class EmailService : IEmailService
         await client.DisconnectAsync(true);
     }
 
-    public async Task EnvoyerEmailConfirmationAsync(string to, string nom, string prenom, string numeroReservation)
+    public async Task EnvoyerEmailConfirmationAsync(string to, string nom, string prenom, string qrCodeBase64, string urlScan)
     {
         var sujet = "Confirmation de réservation";
+        var inlineContentId = "qr-code-reservation";
+        var qrBytes = string.IsNullOrEmpty(qrCodeBase64) ? Array.Empty<byte>() : Convert.FromBase64String(qrCodeBase64);
         var corps = $@"
             <html>
             <body>
                 <h2>Confirmation de réservation</h2>
                 <p>Bonjour {prenom} {nom},</p>
-                <p>Votre réservation a été confirmée avec le numéro : <strong>{numeroReservation}</strong></p>
+                <p>Votre QR code de réservation est prêt :</p>
+                <p>
+                    <img src='cid:{inlineContentId}' alt='QR Code réservation' style='width:200px;height:200px;object-fit:contain;border:1px solid #ddd;padding:8px;border-radius:8px;' />
+                </p>
+                <p>Si vous ne voyez pas le QR code, utilisez le lien suivant : <a href='{urlScan}'>{urlScan}</a></p>
                 <p>Merci de votre confiance !</p>
             </body>
             </html>";
-        await EnvoyerEmailAsync(to, sujet, corps);
+        await EnvoyerEmailAsync(to, sujet, corps, qrBytes, inlineContentId);
     }
 
     public async Task EnvoyerFactureParEmailAsync(string to, string nom, string prenom, string factureUrl)

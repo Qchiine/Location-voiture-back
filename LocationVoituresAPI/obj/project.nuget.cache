@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ocGbUJ8hyWg=",
+  "dgSpecHash": "s7oHY4ZHLpw=",
   "success": true,
   "projectFilePath": "/Users/m3/Documents/Projects/c#.net/Location-voiture-back/LocationVoituresAPI/LocationVoituresAPI.csproj",
   "expectedPackageFiles": [
@@ -146,7 +146,10 @@
     "/Users/m3/.nuget/packages/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg.sha512",
     "/Users/m3/.nuget/packages/system.threading.tasks.extensions/4.3.0/system.threading.tasks.extensions.4.3.0.nupkg.sha512",
     "/Users/m3/.nuget/packages/system.xml.readerwriter/4.3.1/system.xml.readerwriter.4.3.1.nupkg.sha512",
-    "/Users/m3/.nuget/packages/system.xml.xmldocument/4.3.0/system.xml.xmldocument.4.3.0.nupkg.sha512"
+    "/Users/m3/.nuget/packages/system.xml.xmldocument/4.3.0/system.xml.xmldocument.4.3.0.nupkg.sha512",
+    "/Users/m3/.nuget/packages/microsoft.netcore.app.ref/8.0.22/microsoft.netcore.app.ref.8.0.22.nupkg.sha512",
+    "/Users/m3/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.22/microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512",
+    "/Users/m3/.nuget/packages/microsoft.netcore.app.host.osx-arm64/8.0.22/microsoft.netcore.app.host.osx-arm64.8.0.22.nupkg.sha512"
   ],
   "logs": []
 }
