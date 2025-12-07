@@ -99,5 +99,24 @@ public class EmailService : IEmailService
             </html>";
         await EnvoyerEmailAsync(to, sujet, corps);
     }
+
+    public async Task EnvoyerCodeResetPasswordAsync(string to, string nom, string code)
+    {
+        var sujet = "Réinitialisation de mot de passe";
+        var corps = $@"
+            <html>
+            <body>
+                <h2>Réinitialisation de mot de passe</h2>
+                <p>Bonjour {nom},</p>
+                <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
+                <p>Votre code de vérification est : <strong style='font-size: 24px; color: #007bff;'>{code}</strong></p>
+                <p>Ce code est valide pendant 15 minutes.</p>
+                <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet email.</p>
+                <br/>
+                <p>Cordialement,<br/>L'équipe Location Voitures</p>
+            </body>
+            </html>";
+        await EnvoyerEmailAsync(to, sujet, corps);
+    }
 }
 

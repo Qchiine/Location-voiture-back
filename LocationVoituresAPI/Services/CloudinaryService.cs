@@ -19,14 +19,26 @@ public class CloudinaryService : ICloudinaryService
 
     public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
     {
+        // Réinitialiser la position du stream
+        if (imageStream.CanSeek)
+        {
+            imageStream.Seek(0, SeekOrigin.Begin);
+        }
+
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(fileName, imageStream),
-            Folder = "location-voitures/vehicules",
+            Folder = "location-voitures/qrcodes",
             Transformation = new Transformation().Quality("auto").FetchFormat("auto")
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+        
+        if (uploadResult.Error != null)
+        {
+            throw new Exception($"Cloudinary upload error: {uploadResult.Error.Message}");
+        }
+        
         return uploadResult.SecureUrl.ToString();
     }
 

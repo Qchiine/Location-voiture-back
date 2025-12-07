@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LocationVoituresAPI.Models;
 
@@ -31,6 +32,7 @@ public class TypeVehicule
     public DateTime DateCreation { get; set; } = DateTime.Now;
 
     // Relations
+    [JsonIgnore]
     public virtual ICollection<Vehicule> Vehicules { get; set; } = new List<Vehicule>();
 }
 

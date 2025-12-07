@@ -15,6 +15,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         options.JsonSerializerOptions.PropertyNamingPolicy = null; // Garde les noms de propriétés en PascalCase
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Fix circular references
     });
 builder.Services.AddEndpointsApiExplorer();
 
@@ -121,8 +122,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// IMPORTANT: UseCors must be called before UseAuthentication and UseAuthorization
 app.UseCors("AllowAll");
+// Disable HTTPS redirection in development to avoid CORS issues
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

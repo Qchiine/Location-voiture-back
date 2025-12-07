@@ -1,0 +1,1485 @@
+{
+	"info": {
+		"_postman_id": "location-voitures-api-2024",
+		"name": "Location Voitures API - Collection Complète",
+		"description": "Collection Postman complète pour tester tous les endpoints de l'API Location de Voitures",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5269",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', jsonData.token);",
+									"    console.log('Token saved:', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Email\": \"admin@location-voitures.fr\",\n  \"MotDePasse\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Register Client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Nom\": \"Dupont\",\n  \"Prenom\": \"Jean\",\n  \"Email\": \"jean.dupont@example.com\",\n  \"MotDePasse\": \"Password123!\",\n  \"Telephone\": \"0612345678\",\n  \"Adresse\": \"123 Rue de Paris, 75001 Paris\",\n  \"NumeroPermis\": \"ABC123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register Employe (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Nom\": \"Martin\",\n  \"Prenom\": \"Sophie\",\n  \"Email\": \"sophie.martin@location-voitures.fr\",\n  \"MotDePasse\": \"Employee123!\",\n  \"Matricule\": \"EMP001\",\n  \"DateEmbauche\": \"2024-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Auth/register-employe",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Auth", "register-employe"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"RefreshToken\": \"your-refresh-token\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Auth/refresh-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Auth", "refresh-token"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Setup (Dev Only)",
+			"item": [
+				{
+					"name": "Create Default Admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Setup/create-admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Setup", "create-admin"]
+						}
+					}
+				},
+				{
+					"name": "Create Custom Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Nom\": \"Super\",\n  \"Prenom\": \"Admin\",\n  \"Email\": \"superadmin@location.fr\",\n  \"MotDePasse\": \"SuperAdmin@2024\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Setup/create-custom-admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Setup", "create-custom-admin"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Admin",
+			"item": [
+				{
+					"name": "Create First Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Nom\": \"Admin\",\n  \"Prenom\": \"Principal\",\n  \"Email\": \"admin@location.fr\",\n  \"MotDePasse\": \"Admin@12345\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Admin/create-first-admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Admin", "create-first-admin"]
+						}
+					}
+				},
+				{
+					"name": "Create Admin (Auth Required)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Nom\": \"Second\",\n  \"Prenom\": \"Admin\",\n  \"Email\": \"admin2@location.fr\",\n  \"MotDePasse\": \"SecondAdmin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Admin/create-admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Admin", "create-admin"]
+						}
+					}
+				},
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Admin/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Admin", "dashboard"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Clients",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients", "me"]
+						}
+					}
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Telephone\": \"0612345678\",\n  \"Adresse\": \"456 Avenue des Champs, 75008 Paris\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients", "me"]
+						}
+					}
+				},
+				{
+					"name": "Get All Clients (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients"]
+						}
+					}
+				},
+				{
+					"name": "Get Client by ID (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Client Locations (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients/1/locations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients", "1", "locations"]
+						}
+					}
+				},
+				{
+					"name": "Get Total Clients Count (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients/count/total",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients", "count", "total"]
+						}
+					}
+				},
+				{
+					"name": "Get Clients Statistics (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Clients/stats/overview",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Clients", "stats", "overview"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Types de Véhicules",
+			"item": [
+				{
+					"name": "Get All Type Vehicules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/TypeVehicules",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "TypeVehicules"]
+						}
+					}
+				},
+				{
+					"name": "Get Type Vehicule by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/TypeVehicules/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "TypeVehicules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Type Vehicule (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Nom\": \"SUV\",\n  \"Description\": \"Véhicule utilitaire sportif spacieux\",\n  \"Categorie\": \"Luxe\",\n  \"PrixBaseJournalier\": 80.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/TypeVehicules",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "TypeVehicules"]
+						}
+					}
+				},
+				{
+					"name": "Update Type Vehicule (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Id\": 1,\n  \"Nom\": \"SUV Premium\",\n  \"Description\": \"Véhicule SUV haut de gamme\",\n  \"Categorie\": \"Luxe\",\n  \"PrixBaseJournalier\": 90.00\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/TypeVehicules/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "TypeVehicules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Type Vehicule (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/TypeVehicules/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "TypeVehicules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Type Vehicule Stats (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/TypeVehicules/1/statistiques",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "TypeVehicules", "1", "statistiques"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Véhicules",
+			"item": [
+				{
+					"name": "Get All Vehicules",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules"]
+						}
+					}
+				},
+				{
+					"name": "Get Vehicules Disponibles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules/disponibles?dateDebut=2024-12-10&dateFin=2024-12-15",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules", "disponibles"],
+							"query": [
+								{
+									"key": "dateDebut",
+									"value": "2024-12-10"
+								},
+								{
+									"key": "dateFin",
+									"value": "2024-12-15"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Vehicule by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Vehicule (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Marque\": \"Peugeot\",\n  \"Modele\": \"308\",\n  \"Annee\": 2023,\n  \"Immatriculation\": \"AB-123-CD\",\n  \"Couleur\": \"Noir\",\n  \"Kilometrage\": 5000,\n  \"PrixJournalier\": 45.00,\n  \"EstDisponible\": true,\n  \"TypeVehiculeId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules"]
+						}
+					}
+				},
+				{
+					"name": "Update Vehicule (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Id\": 1,\n  \"Marque\": \"Peugeot\",\n  \"Modele\": \"308 GT\",\n  \"Annee\": 2023,\n  \"Immatriculation\": \"AB-123-CD\",\n  \"Couleur\": \"Noir\",\n  \"Kilometrage\": 6000,\n  \"PrixJournalier\": 50.00,\n  \"EstDisponible\": true,\n  \"TypeVehiculeId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Vehicule (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules", "1"]
+						}
+					}
+				},
+				{
+					"name": "Upload Vehicle Images (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Vehicules/1/upload-images",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Vehicules", "1", "upload-images"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Locations",
+			"item": [
+				{
+					"name": "Get All Locations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Locations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Locations"]
+						}
+					}
+				},
+				{
+					"name": "Get Location by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Locations/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Locations", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Location",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ClientId\": 1,\n  \"VehiculeId\": 1,\n  \"DateDebut\": \"2024-12-10T10:00:00\",\n  \"DateFin\": \"2024-12-15T10:00:00\",\n  \"EmployeId\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Locations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Locations"]
+						}
+					}
+				},
+				{
+					"name": "Update Location",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Id\": 1,\n  \"ClientId\": 1,\n  \"VehiculeId\": 1,\n  \"DateDebut\": \"2024-12-10T10:00:00\",\n  \"DateFin\": \"2024-12-16T10:00:00\",\n  \"Statut\": \"CONFIRMEE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Locations/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Locations", "1"]
+						}
+					}
+				},
+				{
+					"name": "Generer Facture",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Locations/1/generer-facture",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Locations", "1", "generer-facture"]
+						}
+					}
+				},
+				{
+					"name": "Confirmer Location",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Locations/1/confirmer",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Locations", "1", "confirmer"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Paiements",
+			"item": [
+				{
+					"name": "Get Paiement by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Paiements/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Paiements", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Paiement",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"LocationId\": 1,\n  \"Montant\": 225.00,\n  \"ModePaiement\": \"CARTE_CREDIT\",\n  \"Statut\": \"EN_ATTENTE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Paiements",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Paiements"]
+						}
+					}
+				},
+				{
+					"name": "Update Statut Paiement (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"VALIDE\""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Paiements/1/statut",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Paiements", "1", "statut"]
+						}
+					}
+				},
+				{
+					"name": "Generer Recu PDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Paiements/1/recu",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Paiements", "1", "recu"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Entretiens",
+			"item": [
+				{
+					"name": "Get All Entretiens",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens"]
+						}
+					}
+				},
+				{
+					"name": "Get Entretiens Urgents",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens/urgents",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens", "urgents"]
+						}
+					}
+				},
+				{
+					"name": "Get Entretien by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Entretien (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"VehiculeId\": 1,\n  \"DateEntretien\": \"2024-12-20T09:00:00\",\n  \"TypeEntretien\": \"REVISION_PERIODIQUE\",\n  \"Description\": \"Révision des 20 000 km\",\n  \"Cout\": 350.00,\n  \"EstUrgent\": false,\n  \"Statut\": \"PLANIFIE\",\n  \"EmployeId\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens"]
+						}
+					}
+				},
+				{
+					"name": "Update Entretien (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Id\": 1,\n  \"VehiculeId\": 1,\n  \"DateEntretien\": \"2024-12-20T09:00:00\",\n  \"TypeEntretien\": \"REVISION_PERIODIQUE\",\n  \"Description\": \"Révision des 20 000 km - Complète\",\n  \"Cout\": 400.00,\n  \"EstUrgent\": false,\n  \"Statut\": \"EN_COURS\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens", "1"]
+						}
+					}
+				},
+				{
+					"name": "Terminer Entretien (Admin/Employee)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens/1/terminer",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens", "1", "terminer"]
+						}
+					}
+				},
+				{
+					"name": "Delete Entretien (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Entretiens/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Entretiens", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "10. Rapports",
+			"item": [
+				{
+					"name": "Get All Rapports (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports"]
+						}
+					}
+				},
+				{
+					"name": "Get Rapport by ID (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "1"]
+						}
+					}
+				},
+				{
+					"name": "Generer Statistiques Globales (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/generer-statistiques-globales?format=PDF",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "generer-statistiques-globales"],
+							"query": [
+								{
+									"key": "format",
+									"value": "PDF"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Generer Rapport Locations Periode (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/generer-locations-periode?dateDebut=2024-12-01&dateFin=2024-12-31&format=PDF",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "generer-locations-periode"],
+							"query": [
+								{
+									"key": "dateDebut",
+									"value": "2024-12-01"
+								},
+								{
+									"key": "dateFin",
+									"value": "2024-12-31"
+								},
+								{
+									"key": "format",
+									"value": "PDF"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Generer Rapport Revenus Periode (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/generer-revenus-periode?dateDebut=2024-12-01&dateFin=2024-12-31&format=PDF",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "generer-revenus-periode"],
+							"query": [
+								{
+									"key": "dateDebut",
+									"value": "2024-12-01"
+								},
+								{
+									"key": "dateFin",
+									"value": "2024-12-31"
+								},
+								{
+									"key": "format",
+									"value": "PDF"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Generer Rapport Entretiens (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/generer-entretiens?dateDebut=2024-12-01&dateFin=2024-12-31&format=PDF",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "generer-entretiens"],
+							"query": [
+								{
+									"key": "dateDebut",
+									"value": "2024-12-01"
+								},
+								{
+									"key": "dateFin",
+									"value": "2024-12-31"
+								},
+								{
+									"key": "format",
+									"value": "PDF"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Generer Rapport Vehicules (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/generer-vehicules?format=PDF",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "generer-vehicules"],
+							"query": [
+								{
+									"key": "format",
+									"value": "PDF"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Exporter Rapport PDF (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/1/exporter-pdf",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "1", "exporter-pdf"]
+						}
+					}
+				},
+				{
+					"name": "Exporter Rapport Excel (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/1/exporter-excel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "1", "exporter-excel"]
+						}
+					}
+				},
+				{
+					"name": "Delete Rapport (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/Rapports/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "Rapports", "1"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

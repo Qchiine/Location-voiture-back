@@ -19,6 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Paiement> Paiements { get; set; }
     public DbSet<Entretien> Entretiens { get; set; }
     public DbSet<Rapport> Rapports { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -82,16 +83,26 @@ public class ApplicationDbContext : DbContext
                   .HasForeignKey(l => l.EmployeId)
                   .OnDelete(DeleteBehavior.SetNull);
 
-            entity.HasOne(l => l.Paiement)
-                  .WithOne(p => p.Location)
-                  .HasForeignKey<Paiement>(p => p.LocationId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            // Convertir les enums en string pour MySQL
+            entity.Property(e => e.Statut)
+                  .HasConversion<string>();
         });
 
         // Configuration Paiement
         modelBuilder.Entity<Paiement>(entity =>
         {
             entity.HasIndex(e => e.Reference).IsUnique();
+            
+            entity.HasOne(p => p.Location)
+                  .WithMany(l => l.Paiements)
+                  .HasForeignKey(p => p.LocationId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            
+            // Convertir les enums en string pour MySQL
+            entity.Property(e => e.ModePaiement)
+                  .HasConversion<string>();
+            entity.Property(e => e.Statut)
+                  .HasConversion<string>();
         });
 
         // Configuration Entretien
@@ -106,6 +117,12 @@ public class ApplicationDbContext : DbContext
                   .WithMany(emp => emp.Entretiens)
                   .HasForeignKey(e => e.EmployeId)
                   .OnDelete(DeleteBehavior.SetNull);
+            
+            // Convertir les enums en string pour MySQL
+            entity.Property(e => e.TypeEntretien)
+                  .HasConversion<string>();
+            entity.Property(e => e.Statut)
+                  .HasConversion<string>();
         });
 
         // Configuration Rapport
@@ -115,6 +132,12 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(r => r.AdministrateurId)
                   .OnDelete(DeleteBehavior.Cascade);
+            
+            // Convertir les enums en string pour MySQL
+            entity.Property(e => e.TypeRapport)
+                  .HasConversion<string>();
+            entity.Property(e => e.Format)
+                  .HasConversion<string>();
         });
     }
 }

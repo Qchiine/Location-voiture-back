@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LocationVoituresAPI.Models;
 
@@ -58,10 +59,12 @@ public class Vehicule
 
     // Navigation properties
     [ForeignKey("TypeVehiculeId")]
-    public virtual TypeVehicule TypeVehicule { get; set; } = null!;
+    public virtual TypeVehicule? TypeVehicule { get; set; }
 
     // Relations
+    [JsonIgnore]
     public virtual ICollection<Location> Locations { get; set; } = new List<Location>();
+    [JsonIgnore]
     public virtual ICollection<Entretien> Entretiens { get; set; } = new List<Entretien>();
 
     // Méthodes métier

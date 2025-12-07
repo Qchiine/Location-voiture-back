@@ -7,5 +7,6 @@ public interface IEmailService
     Task EnvoyerAlerteEntretienAsync(string to, string vehiculeInfo, DateTime dateEntretien);
     Task EnvoyerNotificationAsync(string to, string sujet, string message);
     Task EnvoyerRappelAsync(string to, string message);
+    Task EnvoyerCodeResetPasswordAsync(string to, string nom, string code);
 }
 

@@ -14,11 +14,13 @@ public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
-    public AuthService(ApplicationDbContext context, IConfiguration configuration)
+    public AuthService(ApplicationDbContext context, IConfiguration configuration, IEmailService emailService)
     {
         _context = context;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
@@ -183,6 +185,93 @@ public class AuthService : IAuthService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public async Task<bool> SendPasswordResetCodeAsync(string email)
+    {
+        var utilisateur = await _context.Utilisateurs
+            .FirstOrDefaultAsync(u => u.Email == email && u.EstActif);
+
+        if (utilisateur == null)
+            return false;
+
+        // Supprimer les anciens codes non utilisés pour cet utilisateur
+        var oldTokens = await _context.PasswordResetTokens
+            .Where(t => t.UtilisateurId == utilisateur.Id && !t.EstUtilise)
+            .ToListAsync();
+        _context.PasswordResetTokens.RemoveRange(oldTokens);
+
+        // Générer un code à 6 chiffres
+        var random = new Random();
+        var code = random.Next(100000, 999999).ToString();
+
+        // Créer le token
+        var resetToken = new PasswordResetToken
+        {
+            UtilisateurId = utilisateur.Id,
+            Code = code,
+            DateExpiration = DateTime.Now.AddMinutes(15), // Valide 15 minutes
+            EstUtilise = false
+        };
+
+        _context.PasswordResetTokens.Add(resetToken);
+        await _context.SaveChangesAsync();
+
+        // Envoyer l'email
+        await _emailService.EnvoyerCodeResetPasswordAsync(
+            utilisateur.Email, 
+            utilisateur.Prenom, 
+            code
+        );
+
+        return true;
+    }
+
+    public async Task<bool> VerifyResetCodeAsync(string email, string code)
+    {
+        var utilisateur = await _context.Utilisateurs
+            .FirstOrDefaultAsync(u => u.Email == email && u.EstActif);
+
+        if (utilisateur == null)
+            return false;
+
+        var resetToken = await _context.PasswordResetTokens
+            .Where(t => t.UtilisateurId == utilisateur.Id 
+                     && t.Code == code 
+                     && !t.EstUtilise 
+                     && t.DateExpiration > DateTime.Now)
+            .FirstOrDefaultAsync();
+
+        return resetToken != null;
+    }
+
+    public async Task<bool> ResetPasswordAsync(string email, string code, string newPassword)
+    {
+        var utilisateur = await _context.Utilisateurs
+            .FirstOrDefaultAsync(u => u.Email == email && u.EstActif);
+
+        if (utilisateur == null)
+            return false;
+
+        var resetToken = await _context.PasswordResetTokens
+            .Where(t => t.UtilisateurId == utilisateur.Id 
+                     && t.Code == code 
+                     && !t.EstUtilise 
+                     && t.DateExpiration > DateTime.Now)
+            .FirstOrDefaultAsync();
+
+        if (resetToken == null)
+            return false;
+
+        // Mettre à jour le mot de passe
+        utilisateur.MotDePasseHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+        // Marquer le token comme utilisé
+        resetToken.EstUtilise = true;
+
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }
 

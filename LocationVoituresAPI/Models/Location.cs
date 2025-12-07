@@ -61,7 +61,7 @@ public class Location
     public virtual Employe? Employe { get; set; }
 
     // Relations
-    public virtual Paiement? Paiement { get; set; }
+    public virtual ICollection<Paiement> Paiements { get; set; } = new List<Paiement>();
 
     // Méthodes métier
     public void CalculerMontant(Vehicule vehicule)

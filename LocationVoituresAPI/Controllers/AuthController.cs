@@ -35,7 +35,7 @@ public class AuthController : ControllerBase
 
         var result = await _authService.RegisterAsync(registerDto);
         if (result == null)
-            return BadRequest("Erreur lors de l'inscription. Vérifiez vos données.");
+            return BadRequest(new { success = false, message = "Erreur lors de l'inscription. Vérifiez vos données (téléphone, adresse, numéro de permis requis)." });
 
         return Ok(result);
     }
@@ -62,5 +62,39 @@ public class AuthController : ControllerBase
             return Unauthorized("Token invalide");
 
         return Ok(result);
+    }
+
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+    {
+        var result = await _authService.SendPasswordResetCodeAsync(forgotPasswordDto.Email);
+        
+        // Toujours retourner succès pour ne pas révéler si l'email existe ou non (sécurité)
+        return Ok(new { message = "Si cet email existe, un code de réinitialisation a été envoyé." });
+    }
+
+    [HttpPost("verify-reset-code")]
+    [AllowAnonymous]
+    public async Task<ActionResult> VerifyResetCode([FromBody] VerifyResetCodeDto verifyDto)
+    {
+        var isValid = await _authService.VerifyResetCodeAsync(verifyDto.Email, verifyDto.Code);
+        
+        if (!isValid)
+            return BadRequest(new { message = "Code invalide ou expiré." });
+
+        return Ok(new { message = "Code valide.", valid = true });
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto resetDto)
+    {
+        var result = await _authService.ResetPasswordAsync(resetDto.Email, resetDto.Code, resetDto.NewPassword);
+        
+        if (!result)
+            return BadRequest(new { message = "Code invalide ou expiré." });
+
+        return Ok(new { message = "Mot de passe réinitialisé avec succès." });
     }
 }
